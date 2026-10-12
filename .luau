@@ -335,7 +335,7 @@ AddConnection(layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(fun
     end)
 end))
 
--- Drag window from the top bar
+
 local dragging, dragInput, dragStart, startPos
 
 local function updateDrag(input)
