@@ -1,4 +1,3 @@
-
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
@@ -152,8 +151,8 @@ end
 
 
 local mainFrame = Create("Frame", {
-    Size = UDim2.new(0, 850, 0, 500),
-    Position = UDim2.new(0.5, -425, 0.5, -250),
+    Size = UDim2.new(0, 650, 0, 400),
+    Position = UDim2.new(0.5, -325, 0.5, -200),
     BackgroundColor3 = Color3.fromRGB(25, 25, 25),
     BorderSizePixel = 0,
     Active = true,
@@ -163,8 +162,9 @@ local mainFrame = Create("Frame", {
 assert(mainFrame, "Failed to create main frame")
 Corner(mainFrame, 10)
 
+
 local topBar = Create("Frame", {
-    Size = UDim2.new(1, 0, 0, 40),
+    Size = UDim2.new(1, 0, 0, 34),
     BackgroundColor3 = Color3.fromRGB(35, 35, 35),
     BorderSizePixel = 0,
     Active = true
@@ -172,58 +172,73 @@ local topBar = Create("Frame", {
 
 Corner(topBar, 10)
 
+local SCRIPT_VERSION = "1.2"
+
 Create("TextLabel", {
-    Size = UDim2.new(1, -45, 1, 0),
-    Position = UDim2.new(0, 0, 0, 0),
+    Size = UDim2.new(0, 160, 1, 0),
+    Position = UDim2.new(0, 10, 0, 0),
     BackgroundTransparency = 1,
     Text = GUI_NAME,
     Font = Enum.Font.GothamBold,
-    TextSize = 16,
-    TextColor3 = Color3.new(1, 1, 1)
+    TextSize = 14,
+    TextColor3 = Color3.new(1, 1, 1),
+    TextXAlignment = Enum.TextXAlignment.Left
+}, topBar)
+
+Create("TextLabel", {
+    Size = UDim2.new(0, 50, 1, 0),
+    Position = UDim2.new(0, 140, 0, 0),
+    BackgroundTransparency = 1,
+    Text = SCRIPT_VERSION,
+    Font = Enum.Font.GothamBold,
+    TextSize = 14,
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextXAlignment = Enum.TextXAlignment.Left
 }, topBar)
 
 local closeButton = Create("TextButton", {
     Name = "CloseButton",
-    Size = UDim2.new(0, 32, 0, 30),
-    Position = UDim2.new(1, -38, 0, 5),
+    Size = UDim2.new(0, 26, 0, 25),
+    Position = UDim2.new(1, -31, 0, 4),
     BackgroundColor3 = Color3.fromRGB(180, 45, 45),
     BorderSizePixel = 0,
     Text = "X",
     TextColor3 = Color3.new(1, 1, 1),
-    TextSize = 16,
+    TextSize = 13,
     Font = Enum.Font.GothamBold,
     AutoButtonColor = true
 }, topBar)
 
 Corner(closeButton, 6)
 
+
 local searchBox = Create("TextBox", {
-    Size = UDim2.new(0, 250, 0, 30),
-    Position = UDim2.new(0, 10, 0, 50),
+    Size = UDim2.new(0, 180, 0, 27),
+    Position = UDim2.new(0, 10, 0, 43),
     PlaceholderText = "Search Player...",
     Text = "",
     ClearTextOnFocus = false,
     BackgroundColor3 = Color3.fromRGB(40, 40, 40),
     TextColor3 = Color3.new(1, 1, 1),
+    PlaceholderColor3 = Color3.fromRGB(155, 155, 155),
     Font = Enum.Font.Gotham,
-    TextSize = 13,
+    TextSize = 12,
     BorderSizePixel = 0
 }, mainFrame)
 
-Corner(searchBox, 8)
+Corner(searchBox, 7)
 
 
 local playerList = Create("Frame", {
     Name = "PlayerList",
-    Position = UDim2.new(0, 10, 0, 90),
-    Size = UDim2.new(0, 280, 1, -100),
+    Position = UDim2.new(0, 10, 0, 78),
+    Size = UDim2.new(0, 200, 1, -88),
     BackgroundColor3 = Color3.fromRGB(30, 30, 30),
     BorderSizePixel = 0,
     ClipsDescendants = true
 }, mainFrame)
 
 Corner(playerList, 8)
-
 
 local scrollFrame = Create("ScrollingFrame", {
     Name = "PlayerScrollFrame",
@@ -241,10 +256,9 @@ local scrollFrame = Create("ScrollingFrame", {
 
 local layout = Create("UIListLayout", {
     SortOrder = Enum.SortOrder.LayoutOrder,
-    Padding = UDim.new(0, 10),
+    Padding = UDim.new(0, 7),
     HorizontalAlignment = Enum.HorizontalAlignment.Center
 }, scrollFrame)
-
 
 local isScrolling = false
 local scrollInputActive = false
@@ -279,35 +293,35 @@ AddConnection(scrollFrame.InputEnded:Connect(function(input)
     SafeCall("Scroll InputEnded", EndScrolling, input)
 end))
 
-
 AddConnection(UserInputService.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseWheel
-        and scrollFrame
-        and scrollFrame.Parent then
+    if input.UserInputType ~= Enum.UserInputType.MouseWheel
+        or not scrollFrame
+        or not scrollFrame.Parent then
+        return
+    end
 
-        local mousePosition = UserInputService:GetMouseLocation()
-        local absolutePosition = scrollFrame.AbsolutePosition
-        local absoluteSize = scrollFrame.AbsoluteSize
+    local mousePosition = UserInputService:GetMouseLocation()
+    local absolutePosition = scrollFrame.AbsolutePosition
+    local absoluteSize = scrollFrame.AbsoluteSize
 
-        local inside =
-            mousePosition.X >= absolutePosition.X
-            and mousePosition.X <= absolutePosition.X + absoluteSize.X
-            and mousePosition.Y >= absolutePosition.Y
-            and mousePosition.Y <= absolutePosition.Y + absoluteSize.Y
+    local inside =
+        mousePosition.X >= absolutePosition.X
+        and mousePosition.X <= absolutePosition.X + absoluteSize.X
+        and mousePosition.Y >= absolutePosition.Y
+        and mousePosition.Y <= absolutePosition.Y + absoluteSize.Y
 
-        if inside then
-            isScrolling = true
-            mainFrame.Active = false
+    if inside then
+        isScrolling = true
+        mainFrame.Active = false
 
-            task.delay(0.15, function()
-                if destroyed or scrollInputActive then
-                    return
-                end
+        task.delay(0.15, function()
+            if destroyed or scrollInputActive then
+                return
+            end
 
-                isScrolling = false
-                mainFrame.Active = true
-            end)
-        end
+            isScrolling = false
+            mainFrame.Active = true
+        end)
     end
 end))
 
@@ -315,13 +329,13 @@ AddConnection(layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(fun
     SafeCall("Update scroll canvas", function()
         if scrollFrame and scrollFrame.Parent then
             scrollFrame.CanvasSize = UDim2.new(
-                0, 0, 0, layout.AbsoluteContentSize.Y + 10
+                0, 0, 0, layout.AbsoluteContentSize.Y + 7
             )
         end
     end)
 end))
 
-
+-- Drag window from the top bar
 local dragging, dragInput, dragStart, startPos
 
 local function updateDrag(input)
@@ -341,7 +355,7 @@ local function updateDrag(input)
     SafeCall("Tween window position", function()
         TweenService:Create(
             mainFrame,
-            TweenInfo.new(0.15),
+            TweenInfo.new(0.12),
             {Position = pos}
         ):Play()
     end)
@@ -383,8 +397,8 @@ end))
 
 
 local profileFrame = Create("Frame", {
-    Position = UDim2.new(0, 300, 0, 50),
-    Size = UDim2.new(1, -310, 1, -60),
+    Position = UDim2.new(0, 220, 0, 43),
+    Size = UDim2.new(1, -230, 1, -53),
     BackgroundColor3 = Color3.fromRGB(30, 30, 30),
     BorderSizePixel = 0
 }, mainFrame)
@@ -392,24 +406,24 @@ local profileFrame = Create("Frame", {
 Corner(profileFrame, 8)
 
 local avatar = Create("ImageLabel", {
-    Size = UDim2.new(0, 120, 0, 120),
-    Position = UDim2.new(0, 15, 0, 15),
+    Size = UDim2.new(0, 85, 0, 85),
+    Position = UDim2.new(0, 10, 0, 12),
     BackgroundColor3 = Color3.fromRGB(40, 40, 40),
     BorderSizePixel = 0,
     BackgroundTransparency = 0,
     ScaleType = Enum.ScaleType.Crop
 }, profileFrame)
 
-Corner(avatar, 10)
+Corner(avatar, 8)
 
 local infoLabel = Create("TextLabel", {
-    Position = UDim2.new(0, 150, 0, 15),
-    Size = UDim2.new(1, -165, 1, -30),
+    Position = UDim2.new(0, 105, 0, 10),
+    Size = UDim2.new(1, -115, 1, -20),
     BackgroundTransparency = 1,
     TextXAlignment = Enum.TextXAlignment.Left,
     TextYAlignment = Enum.TextYAlignment.Top,
     Font = Enum.Font.Gotham,
-    TextSize = 14,
+    TextSize = 15,
     TextColor3 = Color3.new(1, 1, 1),
     TextWrapped = true,
     Text = "Select a player..."
@@ -623,7 +637,6 @@ local function SafeRefreshPlayers()
             local search = string.lower(searchBox.Text)
             local order = 0
 
-            -- Les cartes sont maintenant dans scrollFrame.
             for _, child in ipairs(scrollFrame:GetChildren()) do
                 if child:GetAttribute("SFDPlayerCard") then
                     child:Destroy()
@@ -654,7 +667,7 @@ local function SafeRefreshPlayers()
 
                     local card = Create("TextButton", {
                         Name = "Player_" .. tostring(player.UserId),
-                        Size = UDim2.new(1, -10, 0, 60),
+                        Size = UDim2.new(1, -8, 0, 55),
                         BackgroundColor3 = Color3.fromRGB(45, 45, 45),
                         BorderSizePixel = 0,
                         Text = "",
@@ -668,34 +681,34 @@ local function SafeRefreshPlayers()
 
                     card:SetAttribute("SFDPlayerCard", true)
                     card:SetAttribute("SFDUserId", player.UserId)
-                    Corner(card, 8)
+                    Corner(card, 7)
 
                     local head = Create("ImageLabel", {
-                        Size = UDim2.new(0, 45, 0, 45),
-                        Position = UDim2.new(0, 7, 0, 7),
+                        Size = UDim2.new(0, 40, 0, 40),
+                        Position = UDim2.new(0, 6, 0, 7),
                         BackgroundTransparency = 1,
                         ScaleType = Enum.ScaleType.Crop
                     }, card)
 
                     Create("TextLabel", {
-                        Position = UDim2.new(0, 60, 0, 7),
-                        Size = UDim2.new(1, -70, 0, 20),
+                        Position = UDim2.new(0, 53, 0, 6),
+                        Size = UDim2.new(1, -59, 0, 19),
                         BackgroundTransparency = 1,
                         TextColor3 = Color3.new(1, 1, 1),
                         Font = Enum.Font.GothamBold,
-                        TextSize = 13,
+                        TextSize = 12,
                         TextXAlignment = Enum.TextXAlignment.Left,
                         TextTruncate = Enum.TextTruncate.AtEnd,
                         Text = player.Name
                     }, card)
 
                     Create("TextLabel", {
-                        Position = UDim2.new(0, 60, 0, 30),
-                        Size = UDim2.new(1, -70, 0, 20),
+                        Position = UDim2.new(0, 53, 0, 28),
+                        Size = UDim2.new(1, -59, 0, 17),
                         BackgroundTransparency = 1,
                         TextColor3 = Color3.fromRGB(180, 180, 180),
                         Font = Enum.Font.Gotham,
-                        TextSize = 12,
+                        TextSize = 11,
                         TextXAlignment = Enum.TextXAlignment.Left,
                         TextTruncate = Enum.TextTruncate.AtEnd,
                         Text = "@" .. player.DisplayName
@@ -726,8 +739,6 @@ local function SafeRefreshPlayers()
                         end)
                     end
 
-                    -- La connexion appartient à la carte détruite :
-                    -- inutile de l'accumuler dans la liste globale.
                     card.MouseButton1Click:Connect(function()
                         SafeCall("Select player", function()
                             if player.Parent then
